@@ -1,23 +1,22 @@
-Your app will often need a way to let users interact with controls that
-change application state. For example, imagine that you have a template
-that shows a blog title, and supports expanding the post to show the body.
+Seu aplicativo geralmente irá precisa permitir que os usuários interajam com
+controles que alteram o estado do seu aplicativo. Por exemplo, você precisa que tenha um modelo que mostre um título de blog e suporte a expansão do post para mostrar o conteúdo.
 
-If you add the
-[`{{action}}`](http://emberjs.com/api/classes/Ember.Templates.helpers.html#method_action)
-helper to any HTML DOM element, when a user clicks the element, the named event
-will be sent to the template's corresponding component or controller.
+Se você adicionar um método ```{{action}}``` a qualquer elemento DOM do seu documento, quando um usuário clicar no elemento, o evento que você definiu será enviado ao componente ou ao controlador correspondente.
 
-```app/templates/components/single-post.hbs
-<h3><button {{action "toggleBody"}}>{{title}}</button></h3>
-{{#if isShowingBody}}
-  <p>{{{body}}}</p>
-{{/if}}
+```html
+<h3>
+  <button {{action 'toggleBody'}}> {{ title }} </button>
+  {{#if isShowingBody }}
+    <p>
+      {{ body }}
+    </p>
+  {{/if }}
+</h3>
 ```
 
-In the component or controller, you can then define what the action does within
-the `actions` hook:
+No componente ou no controlador, você definir a ```{{action}}``` que o evento irá disparar:
 
-```app/components/single-post.js
+```js
 import Ember from 'ember';
 
 export default Ember.Component.extend({
@@ -29,26 +28,25 @@ export default Ember.Component.extend({
 });
 ```
 
-You will learn about more advanced usages in the Component's [Triggering Changes With Actions](../../components/triggering-changes-with-actions/) guide,
-but you should familiarize yourself with the following basics first.
+Você pode aprender tópicos mas avançados em [Ativando alterações em componentes com ações](../../components/triggering-changes-with-actions/), mas antes disso você deve ser familiarizar-se com os seguintes princípios básicos.
 
-## Action Parameters
+## Parâmentros com ações
 
-You can optionally pass arguments to the action handler. Any values
-passed to the `{{action}}` helper after the action name will be passed to
-the handler as arguments.
+Você opcionalmente pode passa argumentos de manipulação de ação. Todos os valores passados para o ```{{action }}``` após o nome da ação serão interpretados como argumentos e passados para o manipulador.
 
-For example, if the `post` argument was passed:
+Por exemplo, se o argumento ```post``` foi passado:
 
-```handlebars
-<p><button {{action "select" post}}>✓</button> {{post.title}}</p>
+```html
+<p>
+  <button {{action 'select' post}}>✓</button>
+  {{ post.title }}
+</p>
 ```
 
-The `select` action handler would be called with a single argument
-containing the post model:
+Quando o manipulador ```select``` for chamado ele terá um único argumento contendo o modelo de postagem.
 
-```app/components/single-post.js
-import Ember from 'ember';
+```js
+import Ember form 'ember';
 
 export default Ember.Component.extend({
   actions: {
@@ -59,75 +57,51 @@ export default Ember.Component.extend({
 });
 ```
 
-## Specifying the Type of Event
+## Especificando um tipo de evento
 
-By default, the
-[`{{action}}`](http://emberjs.com/api/classes/Ember.Templates.helpers.html#method_action)
-helper listens for click events and triggers the action when the user clicks
-on the element.
+Por padrão, o evento ```{{action }}``` escuta o evento click e aciona a ação quando o usuário clica no elemento.
 
-You can specify an alternative event by using the `on` option.
+Você pode especificar um evento alternativo usando a opção ```on```:
 
-```handlebars
+```html
 <p>
-  <button {{action "select" post on="mouseUp"}}>✓</button>
-  {{post.title}}
+  <button {{action 'select' post on='mouseUp'}}>✓</button>
+  {{ post.title }}
 </p>
 ```
 
-You should use the <code>camelCased</code> event names, so two-word names like `keypress`
-become `keyPress`.
+Você deve usar a notação de escrita ```camelCased``` para o nome dos eventos, então as palavras que tenham 2 nomes, como ```keypress``` ficará assim ```keyPress```.
 
-## Allowing Modifier Keys
+## Permitindo chaves de modificação
+Por padrão o evento ```{{action}}``` irá ignora os eventos de clique quando uma tecla de modicação forem pressionadas. Você pode fornecer uma opção ```allowedKeys``` para especificar quais teclas não devem ser ignoradas.
 
-By default the `{{action}}` helper will ignore click events with
-pressed modifier keys. You can supply an `allowedKeys` option
-to specify which keys should not be ignored.
-
-```handlebars
-<button {{action "anActionName" allowedKeys="alt"}}>
-  click me
+```html
+<button {{action 'select' post allowedKeys='alt'}}>
+  click-me
 </button>
 ```
 
-This way the `{{action}}` will fire when clicking with the alt key
-pressed down.
+## Permitindo ação padrão do browser
+Por padrão o evento ```{{action}}``` impede a ação padrão do navegador no DOM. Se você quiser permitir qualquer ação do navegador, você pode dizer para o Ember não impedir.
 
-## Allowing Default Browser Action
+Por exemplo, se você tiver um link normal e quiser um link quer leve o usuário para outra página além de ativar uma ação quando o link for clicado, você pode usar ```preventDefault=false```:
 
-By default, the `{{action}}` helper prevents the default browser action of the
-DOM event. If you want to allow the browser action, you can stop Ember from
-preventing it.
-
-For example, if you have a normal link tag and want the link to bring the user
-to another page in addition to triggering an ember action when clicked, you can
-use `preventDefault=false`:
-
-```handlebars
-<a href="newPage.htm" {{action "logClick" preventDefault=false}}>Go</a>
+```html
+<a href="newPage.html" {{action 'logClick' preventDefault=false}}>Go</a>
 ```
 
-With `preventDefault=false` omitted, if the user clicked on the link, Ember.js
-will trigger the action, but the user will remain on the current page.
+Com o ```preventDefault=false``` omitido, se o usuário clicar no link, o Ember.js irá ativar ação, mas o usuário irá permancer na página atual.
 
-With `preventDefault=false` present, if the user clicked on the link, Ember.js
-will trigger the action *and* the user will be directed to the new page.
+Com o ```preventDefault=false``` presente, se o usuário clicar no link, o Ember.js irá ativar a ação é o usuário será redirecionando para a nova página.
 
-## Modifying the action's first parameter
-
-If a `value` option for the
-[`{{action}}`](http://emberjs.com/api/classes/Ember.Templates.helpers.html#method_action)
-helper is specified, its value will be considered a property path that will
-be read off of the first parameter of the action. This comes very handy with
-event listeners and enables to work with one-way bindings.
-
-```handlebars
-<label>What's your favorite band?</label>
-<input type="text" value={{favoriteBand}} onblur={{action "bandDidChange"}} />
+## Modificando a ação do primeiro parâmentro
+Se uma opção de valor for especificada para o ```{{action}}```, seu valor será considerado um caminho de propriedade que será lido no primeiro parâmentro da ação. Isso é útil quando queremos ouvi um evento e permitir trabalhar com ligações unidirecionais.
+```html
+<label>Qual a sua banda favorita?</label>
+<input type="text" name="banda" value="{{favoriteBand}}" onblur="{{bandDidChange}}">
 ```
 
-Let's assume we have an action handler that prints its first parameter:
-
+Vamos supor que temos um manipulador de ação que irá imprimir no console o primeiro parâmentro:
 ```js
 actions: {
   bandDidChange(newValue) {
@@ -136,39 +110,17 @@ actions: {
 }
 ```
 
-By default, the action handler receives the first parameter of the event
-listener, the event object the browser passes to the handler, so
-`bandDidChange` prints `Event {}`.
+Por padrão, o manipulador de ação que recebe o primeiro parâmentro ficar escutando os eventos, o navegador passa um objeto de eventos para o manipulador, de modo que o ```bandDidChange``` faz a impressão do ```Evento {}```.
 
-Using the `value` option modifies that behavior by extracting that property from
-the event object:
+Assim o parâmentro ```newValue``` ser torna uma propriedade ```target.value``` do objeto de evento, sendo assim o valor de entrada que o usuário digitou. (por exemplo 'Foo Fighters')
 
-```handlebars
-<label>What's your favorite band?</label>
-<input type="text" value={{favoriteBand}} onblur={{action "bandDidChange" value="target.value"}} />
-```
-
-The `newValue` parameter thus becomes the `target.value` property of the event
-object, which is the value of the input field the user typed. (e.g 'Foo Fighters')
-
-## Attaching Actions to Non-Clickable Elements
-
-Note that actions may be attached to any element of the DOM, but not all
-respond to the `click` event. For example, if an action is attached to an `a`
-link without an `href` attribute, or to a `div`, some browsers won't execute
-the associated function. If it's really needed to define actions over such
-elements, a CSS workaround exists to make them clickable, `cursor: pointer`.
-For example:
+## Fixando uma ação em elementos não clicável
+Observe que as ações podem ser anexadas em qualquer elemento do DOM, mas nem todos os elemento iram responder ao evento click. Por exemplo, se uma ação for anexada a um link sem um atributo href, ou a uma div, alguns navegadores não irão executar a função associada. Ser for realmente necessário definir ações para esses elementos, existe uma solução de CSS para torná-los clicáveis, ```cursor: pointer;```. Por exemplo:
 
 ```css
-[data-ember-action]:not(:disabled) {
+[data-ember-action]:not(disable) {
   cursor: pointer;
 }
 ```
 
-Keep in mind that even with this workaround in place, the `click` event will
-not automatically trigger via keyboard driven `click` equivalents (such as
-the `enter` key when focused). Browsers will trigger this on clickable
-elements only by default. This also doesn't make an element accessible to
-users of assistive technology. You will need to add additional things like
-`role` and/or `tabindex` to make this accessible for your users.
+Tenha em mente que, mesmo com essa solução alternativa, o evento de click não será ativado automaticamente por meio de click por teclado (como a tecla ```Enter``` quando focada). Os navegadores irão desencadear isso em elementos clicáveis apenas por padrão. Isso também não torna um elemento acessível aos usuários com tecnologia assertiva. Você precisará adicionar coisas adicionaais como ```role``` e/ou ```tabindex``` para tornar o conteúdo acessível para seus usuários.
